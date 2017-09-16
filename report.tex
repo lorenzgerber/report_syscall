@@ -1,0 +1,129 @@
+\documentclass[a4paper,11pt,twoside]{article}
+%\documentclass[a4paper,11pt,twoside,se]{article}
+
+\usepackage{UmUStudentReport}
+\usepackage{verbatim}   % Multi-line comments using \begin{comment}
+\usepackage{courier}    % Nicer fonts are used. (not necessary)
+\usepackage{pslatex}    % Also nicer fonts. (not necessary)
+\usepackage[pdftex]{graphicx}   % allows including pdf figures
+\usepackage{listings}
+\usepackage{pgf-umlcd}
+\usepackage{blindtext}
+\usepackage{rotating}
+\usepackage{enumitem}
+%\usepackage{lmodern}   % Optional fonts. (not necessary)
+%\usepackage{tabularx}
+%\usepackage{microtype} % Provides some typographic improvements over default settings
+%\usepackage{placeins}  % For aligning images with \FloatBarrier
+%\usepackage{booktabs}  % For nice-looking tables
+%\usepackage{titlesec}  % More granular control of sections.
+
+% DOCUMENT INFO
+% =============
+\department{Department of Computing Science}
+\coursename{Operating Systems 7.5 p}
+\coursecode{5DV171}
+\title{Assignment 1}
+\author{Lorenz Gerber ({\tt{dv15lgr@cs.umu.se}} {\tt{lozger03@student.umu.se}})}
+\date{2017-09-26}
+%\revisiondate{2016-01-18}
+\instructor{Jan Erik Moström / Adam Dahlgren Lindström}
+
+
+% DOCUMENT SETTINGS
+% =================
+\bibliographystyle{plain}
+%\bibliographystyle{ieee}
+\pagestyle{fancy}
+\raggedbottom
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+%\graphicspath{{images/}}   %Path for images
+
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{listing}{thp}{lop}
+\floatname{listing}{Listing}
+
+
+
+% DEFINES
+% =======
+%\newcommand{\mycommand}{<latex code>}
+
+% DOCUMENT
+% ========
+\begin{document}
+\lstset{language=C}
+\maketitle
+\thispagestyle{empty}
+%\newpage
+%\tableofcontents
+%\thispagestyle{empty}
+\newpage
+
+\clearpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+
+\section{Step by Step Description}
+\subsection{Preparing Raspberry Pi}
+First a recent version of raspbian was installed on the SD card. Here we used `Raspian
+Stretch Lite', Version September 2017, release 2017-09-07 with initial Kernel version
+4.9.
+
+\subsection{Setting up Toolchain}
+Here it was decided to cross-compile the kernel from a Ubunut Linux machine. Hence
+the toolchain had to be set up for cross compiling. The toolchain was obtained
+from \verb+git clone https://github.com/raspberrypi/tools+. In the instructions
+(\verb+https://www.raspberrypi.org/documentation/linux/kernel/building.md+), it
+was advised to copy the toolchain to a common location and add the directory
+\verb+/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin+ to
+the \verb+.bashrc+ path.
+\subsection{Getting the source}
+The Linux kernal sources for Raspberry Pi Raspian were obtained from
+\verb+git clone --depth=1 https://github.com/raspberrypi/linux+.
+
+\subsection{Test Building the Kernel}
+\begin{verbatim}
+cd linux
+KERNEL=kernel7
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2709_defconfig
+make -j 4 -ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage modules dtbs
+\end{verbatim}
+
+Instead of setting the \verb+.bashrc+ path, it is also possible to indicate
+the full path for \verb+arm-linux-gnueabihf+. In this case, this was
+\verb+/usr/local/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/+.
+The \verb+-j 4+ flag chooses the number of processers (times 1.5) to use.
+
+Now the SD card of the Raspberry is plugged into the Linux machine. Within
+the Linux Kernel repo base directory, two mountpoints for the SD card partitions
+are created (\verb+mkdir -p mnt/fat32+ and \verb+mkdir -p mnt/ext4+). The
+SD card is mounted (\verb+sudo mount /dev/sdb1 mnt/fat32+ and
+\verb+sudo mount /dev/sdb2/ mnt/ext4+. Then standing at the kernel repo base
+directory, the modules are installed by:
+\verb+sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=mnt/ext4 modules_install+.
+Again, the full path to \verb+arm-linux-gnueabihf-+ was needed.
+Then the kernel and device tree blobs were copied onto the SD card, also backing
+up the old kernel:
+\begin{verbatim}
+sudo cp mnt/fat32/$KERNEL.img mnt/fat32/$KERNEL-backup.img
+sudo cp arch/arm/boot/zImage mnt/fat32/$KERNEL.img
+sudo cp arch/arm/boot/dts/*.dtb mnt/fat32/
+sudo cp arch/arm/boot/dts/overlays/*.dtb* mnt/fat32/overlays/
+sudo cp arch/arm/boot/dts/overlays/README mnt/fat32/overlays/
+\end{verbatim}
+
+Then the SD card can be umounted and booted in the Raspberry Pi.
+
+
+
+
+
+
+\addcontentsline{toc}{section}{\refname}
+\bibliography{references}
+
+\end{document}
