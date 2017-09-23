@@ -1,4 +1,4 @@
-\NeedsTeXFormat{LaTeX2e} 
+\NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{UmUStudentReport} [2015/09/18 Layout for a student
 reports]
 
@@ -9,7 +9,7 @@ reports]
 % If you got a latex distribution where one of them are not included,
 % either download it or remove it. If it is removed you may get
 % problems with some of the other stuff in the package, but it should
-% be save to comment out that row. 
+% be save to comment out that row.
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage{remreset}          % For internal use in the package.
@@ -65,24 +65,24 @@ reports]
 % PAGE SIZE
 % ---------
 \hoffset         -1in % reset offset to top left corner
-\voffset         -1in %       - " - 
-\textheight     231mm 
-\textwidth      140mm 
+\voffset         -1in %       - " -
+\textheight     231mm
+\textwidth      140mm
 \topmargin       12mm % Distance before the head
 \oddsidemargin   35mm % Good for two sided printing
 \evensidemargin  35mm %       - " -
 \headheight      14mm
 \headsep         5mm  % Distance betwen the head and the text.
 \marginparwidth  15mm % You should not use margins.
-\marginparsep     7pt  
+\marginparsep     7pt
 \marginparpush   12pt
 
 % PACKAGE OPTIONS
 % ---------------
 
-% Swedish option. Use the package as 
-%   \usepackage[se]{article} 
-% if it is written in Swedish. 
+% Swedish option. Use the package as
+%   \usepackage[se]{article}
+% if it is written in Swedish.
 \DeclareOption{se}{
   % Text indentation and paragraph separation usualy differs between
   % text writing in Swedish and text in English. In Swedish texts (and
@@ -92,7 +92,7 @@ reports]
   % the following commands. If you like to have this style even in
   % English texts, copy these two line and put the in the document.
   \setlength{\parindent}{0pt}  % Text indentation.
-  \setlength{\parskip}{6pt}  % Space between paragraphs 
+  \setlength{\parskip}{6pt}  % Space between paragraphs
 
   % French spacing makes non-english text more readable.
   \frenchspacing
@@ -118,7 +118,7 @@ reports]
 \DeclareOption{noindent}{
   % If you prefer not to have indentation of paragraphs
   \setlength{\parindent}{0pt}  % Text indentation.
-  \setlength{\parskip}{6pt}  % Space between paragraphs 
+  \setlength{\parskip}{6pt}  % Space between paragraphs
 }
 
 \ProcessOptions
@@ -134,7 +134,7 @@ reports]
 }
 
 \renewcommand\dateseparator{-}
- 
+
 \renewcommand\Authsep{\\}
 \renewcommand\Authand{\\&}
 \renewcommand\AB@authnote[1]{} % "Fix" bug with affiliations
@@ -142,7 +142,7 @@ reports]
 % PAGE HEADERS
 % ------------
 
-\renewcommand{\headrulewidth}{0pt} 
+\renewcommand{\headrulewidth}{0pt}
 
 \fancyhead[LE,RO]{\thepage(\pageref{LastPage})}
 \fancyheadoffset[LE,RO]{12mm}
@@ -164,14 +164,20 @@ reports]
     \par\vskip1\baselineskip\par\noindent\Large{\@coursename}\normalfont\\%
     \vskip0\baselineskip\par\noindent\Large{\@coursecode}\normalfont%
     \par\vskip1\baselineskip\par\noindent\large\bfseries{\@title}\normalfont%
-    \par\vskip1\baselineskip\small\begin{tabular}{@{}ll}
-    \datename:&\@date\tabularnewline
-    \if\@empty\@revisiondate\else\revisiondatename:&\@revisiondate\tabularnewline\fi
-    \authorname:&\AB@authlist\tabularnewline
-    \if\@empty\@instructor\else\instructorname:&\@instructor\tabularnewline\fi
-    \end{tabular}\normalfont\par\vskip1\baselineskip\par
+    \par\vskip1\baselineskip\par\small\datename:\\
+    \@date\\
+    \par\vskip1\baselineskip\par
+    \if\@empty\@revisiondate\else\revisiondatename:\\
+    \@revisiondate\\\fi
+    \authorname:\\
+    \AB@authlist\\
+    \par\vskip1\baselineskip\par
+    \if\@empty\@instructor\else\instructorname:\\
+    \@instructor\\\fi
+    %\end{tabular}
+    \normalfont\par\vskip1\baselineskip\par
   \end{center}%
-   
+
   \setcounter{footnote}{0}%
   \global\let\thanks\relax
   \global\let\maketitle\relax
@@ -198,7 +204,7 @@ reports]
                                 % following the section is
                                 % surpressed).
   {0.5\baselineskip}%           % Distance after the header.
-  {\normalfont\large\bfseries}} % The font used for the header. Add 
+  {\normalfont\large\bfseries}} % The font used for the header. Add
                                 % \sffamily if you like a sans-serif
                                 % font.
 
@@ -248,17 +254,17 @@ reports]
 \renewcommand\thetable{\mbox{\@arabic\c@table}}
 \renewcommand\thefigure{\mbox{\@arabic\c@figure}}
 
-% This makes (in my opinion) the table floats look nicer. 
+% This makes (in my opinion) the table floats look nicer.
 \renewcommand\floatc@ruled[2]{{\@fs@cfont #1} #2\par}
 \renewcommand\fs@ruled{\def\@fs@cfont{\bfseries}\let\@fs@capt\floatc@ruled
   \def\@fs@pre{\hrule height1.5pt depth0pt \kern4pt}%
   \def\@fs@post{\kern2pt\hrule height0.8pt\relax}%
   \def\@fs@mid{\kern2pt\hrule height0.8pt\kern2pt}%
   \let\@fs@iftopcapt\iftrue}
-\floatstyle{ruled} 
+\floatstyle{ruled}
 \restylefloat{table}
 
 % Captions
 \renewcommand{\captionlabelfont}{\bfseries} % Font used for the name
-\renewcommand{\captionfont}{\small}         % Font size 
-\setlength{\captionmargin}{0.05\linewidth}  
+\renewcommand{\captionfont}{\small}         % Font size
+\setlength{\captionmargin}{0.05\linewidth}
