@@ -24,10 +24,7 @@
 \coursename{Operating Systems 7.5 p}
 \coursecode{5DV171}
 \title{Assignment 1}
-\author{Niklas Königsson ({\tt{dv15nkn@cs.umu.se}}) \\
-Niclas Nyström ({\tt{c14nnm@cs.umu.se}}) \\
-Lorenz Gerber ({\tt{dv15lgr@cs.umu.se}})
-}
+\author{Lorenz Gerber ({\tt{dv15lgr@cs.umu.se}})}
 \date{2017-09-23}
 %\revisiondate{2016-01-18}
 \instructor{Jan Erik Moström / Adam Dahlgren Lindström}
@@ -75,11 +72,12 @@ file descriptors and pending signals for the current user. The information shall
 be obtained in kernel space and then sent back to user space.
 
 \section{Setup and Preparation}
-A recent version of raspbian was installed on the SD card. Here we used `Raspian
+A recent version of raspbian was installed on the SD card (`Raspian
 Stretch Lite', Version September 2017, release 2017-09-07 with initial Kernel
-version 4.9. For performance and convenience, we cross-compile the kernel from a
-Linux machine. Hence the tool-chain had to be set up for cross compilation. The
-tool-chain was obtained from \verb+git clone https://github.com/raspberrypi/tools+.
+version 4.9.) For performance and convenience, the kernel was cross-compiled on a
+Linux machine (Ubuntu 16.04 LTS). Hence the tool-chain had to be set up for
+cross compilation. The tool-chain was obtained from
+\verb+git clone https://github.com/raspberrypi/tools+.
 The Linux kernel source repository for Raspberry Pi Raspian was forked form
 \verb+https://github.com/raspberrypi/linux+. For convenience, scripts for clean
 up, configuration, build and deployment were setup
@@ -88,13 +86,13 @@ up, configuration, build and deployment were setup
 \section{Implementation Syscall}
 \subsection{Summary of Implementation}
 All data needed to implement the required syscall is available in the
-\verb+struct task_struct+ that is defined in the \verb+sched.h+ file. We did a
-step wise implementation where we first wrote a simple `Helloworld' syscall that
-would print to the kernel message buffer. In a second iteration, we implemented
-the data gathering which will be described in more detail below. Finally, we
-coded the data transfer between user and kernel space. During all steps, we
-tried to use test and verification procedures to make sure that the obtained
-data is correct.
+\verb+struct task_struct+ that is defined in the \verb+sched.h+ file. A step wise
+implementation was followed where first a simple `Helloworld' syscall that
+would print to the kernel message buffer was written. In a second iteration,
+the data gathering which will be described in more detail below was implemented.
+Finally, the data transfer between user and kernel space was coded. During all
+steps, it was tried to use test and verification procedures to make sure that
+the obtained data is correct.
 
 \subsection{Used Data structures}
 To get an idea of the involved data structures, initially chapter 3 of
@@ -115,7 +113,6 @@ The pending signals were extracted by bit shifting from the `personal' and `shar
 pending signal data structures (\verb+signal->shared_pending.signal.sig+,
 \verb+pending.signal.sig+). A good description of the signal data structures was
 found in \cite{love2010}.
-
 
 \subsection{Files changed and added}
 Below follows a list of files that were modified. The code is available on
@@ -148,69 +145,20 @@ Open file descriptors were verified using \verb+lsof -u uid | wc -l+. Also here
 it was checked during run-time that opening/closing files was represented in the
 result values.
 Finally, for verifying the pending signals, two small c programs were written,
-where one was only looping over a sleep(5) instruction for a number of times
-\ref{fig:sigpending}.
+where one was only looping over a sleep(5) instruction for a number of times.
+
 The other program was a wrapper that would start a program with blocked
 \verb+SIGINT+ signal handler. Invoking the looper with the wrapper, then
 pressing \verb+Ctrl-x+ resulted in pending signals, which was first checked from
 the console using \verb+cat /proc/pid/status+. Then the corresponding procedure
 was run while invoking the syscall to verify the correct values.
 
-\begin{figure}
-  \label{fig:sigpending}
-  \centering
-  \begin{verbatim}
-    /*
-     * looper.c
-     */
-    #include <stdio.h>
-    #include <unistd.h>
-
-    int main(void){
-      for (int i = 1; i < 10; i++){
-        sleep(5);
-      }
-      printf("finished \n");
-      return 0;
-    }
-
-
-    /*
-     * wrapper.c
-     */
-    #include <signal.h>
-    #include <unistd.h>
-    #include <stdio.h>
-
-    int main(int argc, char *argv[])
-    {
-      sigset_t sigs;
-
-      sigemptyset(&sigs);
-      sigaddset(&sigs, SIGINT);
-      sigprocmask(SIG_BLOCK, &sigs, 0);
-
-      if (argc > 1) {
-        execvp(argv[1], argv + 1);
-        perror("execv");
-      } else {
-        fprintf(stderr, "Usage: %s <command> [args...]\n", argv[0]);
-      }
-      return 1;
-    }
-  \end{verbatim}
-  \caption{\textit{Code listing of looper.c and wrapper.c programs that were used
-  to verify the pending signals. looper.c was started as argument of wrapper.c.
-  wrapper.c blocks SIGINT, hence invocation of Ctrl-x allowed then to verify
-  in the kernel for pending SIGINT signals during run-time.}}
-
-\end{figure}
 
 \subsection{Data transfer Kernel to User Space}
-Here we only used data transport from kernel to user space. This was
+Only data transport from kernel to user space was needed here. This was
 implemented using the \verb+put_user+ functions. The variables in user space
 were provided to kernel space as arguments in the syscall. Hence
-our syscall was implemented using the \verb'SYSCALL_DEFINE3' macro.
+the syscall was implemented using the \verb'SYSCALL_DEFINE3' macro.
 
 \subsection{User space code}
 The user space stub does nothing else than setting up the variables to
